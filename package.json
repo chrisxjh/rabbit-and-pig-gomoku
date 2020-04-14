@@ -1,6 +1,7 @@
 {
   "name": "gomoku",
   "version": "0.1.0",
+  "homepage": "https://chrisxjh.github.io/rabbit-and-pig-gomoku",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.9.10",

@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { SERVER_URL } from '../configs/config';
 
-const backendUrl = 'http://localhost:8080/gomoku';
-
-const getUrl = (target) => `${backendUrl}/${target}`;
+const getUrl = (target) => `${SERVER_URL}/${target}`;
 
 export const httpGet = (url) => axios.get(url);
 
