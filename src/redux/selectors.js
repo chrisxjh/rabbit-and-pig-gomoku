@@ -4,14 +4,16 @@ const selectGameDomain = (state) => state.game;
 
 const selectBoardDomain = (state) => state.board;
 
+const selectPlayerDomain = (state) => state.player;
+
+export const playerIdSelector = createSelector(
+  selectPlayerDomain,
+  (subState) => subState.playerId
+);
+
 export const gameIdSelector = createSelector(
   selectGameDomain,
   (subState) => subState.id
-);
-
-export const playerIdSelector = createSelector(
-  selectGameDomain,
-  (subState) => subState.playerId
 );
 
 export const gameIsLoadingSelector = createSelector(
@@ -22,9 +24,4 @@ export const gameIsLoadingSelector = createSelector(
 export const gameBoardSelector = createSelector(
   selectBoardDomain,
   (subState) => subState.board
-);
-
-export const boardDimensionSelector = createSelector(
-  selectBoardDomain,
-  (subState) => subState.dimension
 );

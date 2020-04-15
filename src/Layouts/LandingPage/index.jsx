@@ -25,7 +25,7 @@ const LandingPage = (props) => {
   };
 
   const handleStartGameWithId = () => {
-    props.startGame({ id: idInput });
+    props.startGame({ gameId: idInput });
     handleCloseDialog();
   };
 

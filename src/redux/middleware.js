@@ -3,40 +3,119 @@ import {
   startGameSuccess,
   requestUpdateSuccess,
   requestUpdateFailure,
+  signUpSuccess,
+  signUp,
+  logInSuccess,
+  restartGameSuccess,
+  restartGameFailure,
+  requestUpdate,
+  startGameFailure,
+  signUpFailure,
+  logInFailure,
 } from './actions';
-import { serverPost, serverGet, serverPut } from '../utils/utils';
+import {
+  serverPost,
+  serverGet,
+  serverPut,
+  getPlayerId,
+  setPlayerId,
+  clearPlayerId,
+} from '../utils/utils';
+import { playerIdSelector } from './selectors';
+import { SUCCESS } from '../common/codes';
 
-const handleStartGame = (store, { payload }) => {
-  const id = payload && payload.id;
-  const params = new URLSearchParams();
+const getParams = (store, config) => {
+  const playerId = playerIdSelector(store.getState());
+  const params = new URLSearchParams({ userId: playerId, ...config });
+  return params;
+};
 
-  if (id) params.set('id', id);
+const handleSignUp = (store) => {
+  serverPost('/signup').then((res) => {
+    const { data } = res;
+    setPlayerId(data.userId);
+    if (data.code === SUCCESS)
+      store.dispatch(signUpSuccess({ userId: data.userId }));
+    else store.dispatch(signUpFailure(data));
+  });
+};
 
-  serverPost(`start?${params.toString()}`).then((res) => {
-    store.dispatch(startGameSuccess(res.data));
+const handleLogin = (store) => {
+  const playerId = getPlayerId();
+  if (!playerId) {
+    return store.dispatch(signUp());
+  }
+
+  const params = new URLSearchParams({ userId: playerId });
+  serverPost(`/login?${params.toString()}`).then((res) => {
+    const { data } = res;
+    if (data.code === SUCCESS)
+      return store.dispatch(logInSuccess({ userId: data.userId }));
+    else store.dispatch(logInFailure(data));
+
+    clearPlayerId();
+    store.dispatch(signUp());
+  });
+};
+
+const handleStartGame = (store, { payload = {} }) => {
+  const { gameId } = payload;
+  const params = getParams(store, gameId ? { gameId } : {});
+
+  serverPost(`/game/gomoku/start?${params.toString()}`).then((res) => {
+    const { data } = res;
+    if (data.code === SUCCESS) store.dispatch(startGameSuccess(data));
+    else store.dispatch(startGameFailure(data));
+  });
+};
+
+const handleRestartGame = (store, { payload }) => {
+  const { gameId } = payload;
+  const params = getParams(store, { gameId });
+
+  serverPut(`/game/gomoku/restart?${params.toString()}`).then((res) => {
+    const { data } = res;
+    if (data.code === SUCCESS) {
+      store.dispatch(restartGameSuccess());
+      store.dispatch(requestUpdate({ gameId }));
+    } else {
+      store.dispatch(restartGameFailure(data));
+    }
   });
 };
 
 const handleRequestUpdate = (store, { payload }) => {
-  const { gameId } = payload;
+  const params = getParams(store, { gameId: payload.gameId });
 
-  serverGet(`${gameId}/update`).then((res) => {
-    store.dispatch(requestUpdateSuccess(res.data));
+  serverGet(`/game/gomoku/update?${params.toString()}`).then((res) => {
+    const {
+      data: { code, update },
+    } = res;
+
+    if (code === SUCCESS && update)
+      store.dispatch(requestUpdateSuccess(update));
+    else if (code !== SUCCESS) store.dispatch(requestUpdateFailure());
   });
 };
 
 const handlePlay = (store, { payload }) => {
   const { gameId, playerId, x, y } = payload;
+  const params = getParams(store, { gameId, x, y });
 
-  serverPut(`${gameId}/play`, { playerId, x, y }).then((res) => {
-    const { code, message, update } = res.data;
-    if (code === 'ERROR') store.dispatch(requestUpdateFailure({ message }));
-    else store.dispatch(requestUpdateSuccess(update));
-  });
+  serverPut(`/game/gomoku/play?${params.toString()}`, { playerId, x, y }).then(
+    (res) => {
+      const { code, message, update } = res.data;
+      if (code === 'SUCCESS') store.dispatch(requestUpdateSuccess(update));
+      else store.dispatch(requestUpdateFailure({ code, message }));
+    }
+  );
 };
 
 const handlers = {
+  [actionTypes.SIGN_UP]: handleSignUp,
+  [actionTypes.LOG_IN]: handleLogin,
   [actionTypes.START_GAME]: handleStartGame,
+  [actionTypes.RESTART_GAME]: handleRestartGame,
   [actionTypes.REQUEST_UPDATE]: handleRequestUpdate,
   [actionTypes.PLAY_MOVE]: handlePlay,
 };

@@ -3,7 +3,6 @@ import { actionTypes } from './actions';
 
 const initialGameState = {
   id: null,
-  playerId: null,
   loading: false,
 };
 
@@ -12,7 +11,7 @@ const game = (state = initialGameState, action) => {
 
   switch (type) {
     case actionTypes.START_GAME:
-      return { ...state, id: null, playerId: null, loading: true };
+      return { ...state, id: null, loading: true };
 
     case actionTypes.START_GAME_SUCCESS:
       return {
@@ -23,7 +22,7 @@ const game = (state = initialGameState, action) => {
       };
 
     case actionTypes.START_GAME_FAILURE:
-      return { ...state, id: null, playerId: null, loading: false };
+      return { ...state, id: null, loading: false };
 
     default:
       break;
@@ -35,7 +34,6 @@ const game = (state = initialGameState, action) => {
 const initialBoardState = {
   board: [],
   loading: false,
-  dimension: 0,
   errorMessage: null,
 };
 
@@ -51,7 +49,6 @@ const board = (state = initialBoardState, action) => {
         ...state,
         loading: false,
         board: payload.board || [],
-        dimension: payload.dimension,
       };
 
     case actionTypes.REQUEST_UPDATE_FAILURE:
@@ -64,4 +61,30 @@ const board = (state = initialBoardState, action) => {
   return { ...state };
 };
 
-export default combineReducers({ game, board });
+const initialPlayerState = {
+  playerId: null,
+  loading: false,
+};
+
+const player = (state = initialPlayerState, action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case actionTypes.SIGN_UP:
+      return { ...state, loading: true };
+
+    case actionTypes.LOG_IN_SUCCESS:
+    case actionTypes.SIGN_UP_SUCCESS:
+      return { ...state, loading: false, playerId: payload.userId };
+
+    case actionTypes.SIGN_UP_FAILURE:
+      return { ...state, loading: false };
+
+    default:
+      break;
+  }
+
+  return { ...state };
+};
+
+export default combineReducers({ game, board, player });

@@ -1,24 +1,23 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { requestUpdate, playMove } from '../../redux/actions';
+import { requestUpdate, playMove, restartGame } from '../../redux/actions';
 import {
   gameIdSelector,
   gameBoardSelector,
-  boardDimensionSelector,
   playerIdSelector,
 } from '../../redux/selectors';
 import { Redirect } from 'react-router-dom';
-import { Container, makeStyles, Typography } from '@material-ui/core';
+import { Container, makeStyles, Typography, Button } from '@material-ui/core';
 
 const UPDATE_INTERVAL = 2000;
 
 const cellSize = 28;
 const clickableSize = 14;
 
-const colorMapper = ['none', '#000', '#fff'];
+const colorMapper = ['#000', '#fff'];
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   boardContainer: {
     position: 'relative',
   },
@@ -44,15 +43,15 @@ const useStyles = makeStyles((theme) => ({
     height: `${clickableSize}px`,
     border: '1px solid transparent',
   },
-}));
+});
 
 const GameLayout = (props) => {
   const {
     gameId,
     requestUpdate,
+    restartGame,
     playMove,
     board,
-    boardDimension,
     playerId,
   } = props;
   const classNames = useStyles();
@@ -75,64 +74,44 @@ const GameLayout = (props) => {
     playMove({ gameId, playerId, x, y });
   };
 
-  const gameBoardSpots = new Array(boardDimension * boardDimension)
-    .fill()
-    .map((column, i) => {
-      const x = i % boardDimension;
-      const y = Math.floor(i / boardDimension);
+  const n = board.length;
+  const m = (board[0] || []).length;
+  const gameArena = [];
 
-      return {
-        x,
-        y,
-        top: `${(y + 1) * cellSize - clickableSize / 2}px`,
-        left: `${(x + 1) * cellSize - clickableSize / 2}px`,
-        value: null,
-      };
-    });
-
-  board.forEach((player, i) => {
-    if (player === null) return;
-
-    gameBoardSpots[i].value = player;
-  });
-
-  const gameArena = (
-    <table className={classNames.arenaTable}>
-      <tbody>
-        {new Array(boardDimension + 1).fill().map((row, i) => {
-          return (
-            <tr key={i}>
-              {new Array(boardDimension + 1).fill().map((col, j) => (
-                <td className={classNames.cell} key={j} />
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
+  for (let i = 0; i <= n; ++i) {
+    const row = [];
+    for (let j = 0; j <= m; ++j) {
+      row.push(<td key={j} className={classNames.cell} />);
+    }
+    gameArena.push(<tr key={i}>{row}</tr>);
+  }
 
   return (
     <Container>
       <Typography variant="h5">Game ID: {gameId}</Typography>
+      <Button onClick={() => restartGame({ gameId })}>Restart</Button>
       <br />
       <div className={classNames.boardContainer}>
         <div>
-          {gameBoardSpots.map((spot, i) => (
-            <span
-              key={i}
-              className={classNames.spot}
-              style={{
-                top: spot.top,
-                left: spot.left,
-                backgroundColor: colorMapper[spot.value],
-                borderColor: spot.value === null ? 'none' : '#555',
-              }}
-              onClick={() => handleCellClick(spot.x, spot.y)}
-            />
-          ))}
+          {board.map((row, y) =>
+            row.map((cell, x) => (
+              <span
+                key={`${x},${y}`}
+                className={classNames.spot}
+                style={{
+                  top: `${(y + 1) * cellSize - clickableSize / 2}px`,
+                  left: `${(x + 1) * cellSize - clickableSize / 2}px`,
+                  backgroundColor: colorMapper[cell],
+                  borderColor: ![0, 1].includes(cell) ? 'transparent' : '#555',
+                }}
+                onClick={() => handleCellClick(x, y)}
+              />
+            ))
+          )}
         </div>
-        {gameArena}
+        <table className={classNames.arenaTable}>
+          <tbody>{gameArena}</tbody>
+        </table>
       </div>
     </Container>
   );
@@ -140,23 +119,22 @@ const GameLayout = (props) => {
 
 GameLayout.propTypes = {
   gameId: PropTypes.string,
-  playerId: PropTypes.number,
-  board: PropTypes.array,
-  boardDimension: PropTypes.number,
+  playerId: PropTypes.string,
+  board: PropTypes.arrayOf(PropTypes.array),
   requestUpdate: PropTypes.func.isRequired,
   playMove: PropTypes.func.isRequired,
+  restartGame: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   gameId: gameIdSelector(state),
   playerId: playerIdSelector(state),
   board: gameBoardSelector(state),
-  boardDimension: boardDimensionSelector(state),
 });
 
 const mapDispatchToProps = {
   requestUpdate,
   playMove,
+  restartGame,
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(GameLayout);
