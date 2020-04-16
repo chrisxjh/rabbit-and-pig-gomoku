@@ -44,13 +44,30 @@ const board = (state = initialBoardState, action) => {
     case actionTypes.REQUEST_UPDATE:
       return { ...state, loading: true };
 
-    case actionTypes.REQUEST_UPDATE_SUCCESS:
+    case actionTypes.REQUEST_UPDATE_SUCCESS: {
+      const boardUpdates = payload.updates.filter((u) =>
+        ['board', 'move'].includes(u.type)
+      );
+
+      if (boardUpdates.length === 0) break;
+
+      const oldBoard = state.board.map((r) => r.slice());
+      const newBoard = boardUpdates.reduce((board, update) => {
+        if (update.type === 'board') {
+          return update.board;
+        } else if (update.type === 'move') {
+          board[update.y][update.x] = update.value;
+        }
+
+        return board;
+      }, oldBoard);
+
       return {
         ...state,
         loading: false,
-        board: payload.board || [],
+        board: newBoard,
       };
-
+    }
     case actionTypes.REQUEST_UPDATE_FAILURE:
       return { ...state, loading: false, errorMessage: payload.message };
 

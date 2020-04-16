@@ -10,7 +10,7 @@ import {
 import { Redirect } from 'react-router-dom';
 import { Container, makeStyles, Typography, Button } from '@material-ui/core';
 
-const UPDATE_INTERVAL = 2000;
+const UPDATE_INTERVAL = 1000;
 
 const cellSize = 28;
 const clickableSize = 14;

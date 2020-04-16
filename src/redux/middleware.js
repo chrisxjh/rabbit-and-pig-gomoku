@@ -89,11 +89,11 @@ const handleRequestUpdate = (store, { payload }) => {
 
   serverGet(`/game/gomoku/update?${params.toString()}`).then((res) => {
     const {
-      data: { code, update },
+      data: { code, updates },
     } = res;
 
-    if (code === SUCCESS && update)
-      store.dispatch(requestUpdateSuccess(update));
+    if (code === SUCCESS && updates)
+      store.dispatch(requestUpdateSuccess({ updates }));
     else if (code !== SUCCESS) store.dispatch(requestUpdateFailure());
   });
 };
@@ -104,8 +104,8 @@ const handlePlay = (store, { payload }) => {
 
   serverPut(`/game/gomoku/play?${params.toString()}`, { playerId, x, y }).then(
     (res) => {
-      const { code, message, update } = res.data;
-      if (code === 'SUCCESS') store.dispatch(requestUpdateSuccess(update));
+      const { code, message, updates } = res.data;
+      if (code === 'SUCCESS') store.dispatch(requestUpdateSuccess({ updates }));
       else store.dispatch(requestUpdateFailure({ code, message }));
     }
   );
