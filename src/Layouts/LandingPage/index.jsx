@@ -8,6 +8,8 @@ import {
   DialogContentText,
   TextField,
   DialogActions,
+  Box,
+  makeStyles,
 } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { startGame } from '../../redux/actions';
@@ -15,9 +17,16 @@ import PropTypes from 'prop-types';
 import { gameIdSelector } from '../../redux/selectors';
 import { Redirect } from 'react-router-dom';
 
+const useStyles = makeStyles((theme) => ({
+  layout: {
+    paddingTop: theme.spacing(6),
+  },
+}));
+
 const LandingPage = (props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [idInput, setIdInput] = useState('');
+  const classNames = useStyles();
 
   const handleCloseDialog = () => {
     setShowDialog(false);
@@ -34,17 +43,19 @@ const LandingPage = (props) => {
   }
 
   return (
-    <Container>
-      <Button variant="contained" onClick={() => setShowDialog(true)}>
-        Enter game ID
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => props.startGame()}
-      >
-        Start a new game
-      </Button>
+    <Container className={classNames.layout}>
+      <Box display="flex" justifyContent="center">
+        <Button variant="contained" onClick={() => setShowDialog(true)}>
+          Enter game ID
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => props.startGame()}
+        >
+          Start a new game
+        </Button>
+      </Box>
       <Dialog open={showDialog} onClose={handleCloseDialog}>
         <DialogTitle>Enter an existing game</DialogTitle>
         <DialogContent>

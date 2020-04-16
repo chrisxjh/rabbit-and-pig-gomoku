@@ -8,7 +8,15 @@ import {
   playerIdSelector,
 } from '../../redux/selectors';
 import { Redirect } from 'react-router-dom';
-import { Container, makeStyles, Typography, Button } from '@material-ui/core';
+import {
+  Container,
+  makeStyles,
+  Typography,
+  Button,
+  Grid,
+  Paper,
+  Box,
+} from '@material-ui/core';
 
 const UPDATE_INTERVAL = 1000;
 
@@ -17,7 +25,10 @@ const clickableSize = 14;
 
 const colorMapper = ['#000', '#fff'];
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
+  layout: {
+    marginTop: theme.spacing(6),
+  },
   boardContainer: {
     position: 'relative',
   },
@@ -43,7 +54,11 @@ const useStyles = makeStyles({
     height: `${clickableSize}px`,
     border: '1px solid transparent',
   },
-});
+  wrapper: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+  },
+}));
 
 const GameLayout = (props) => {
   const {
@@ -87,32 +102,51 @@ const GameLayout = (props) => {
   }
 
   return (
-    <Container>
-      <Typography variant="h5">Game ID: {gameId}</Typography>
-      <Button onClick={() => restartGame({ gameId })}>Restart</Button>
-      <br />
-      <div className={classNames.boardContainer}>
-        <div>
-          {board.map((row, y) =>
-            row.map((cell, x) => (
-              <span
-                key={`${x},${y}`}
-                className={classNames.spot}
-                style={{
-                  top: `${(y + 1) * cellSize - clickableSize / 2}px`,
-                  left: `${(x + 1) * cellSize - clickableSize / 2}px`,
-                  backgroundColor: colorMapper[cell],
-                  borderColor: ![0, 1].includes(cell) ? 'transparent' : '#555',
-                }}
-                onClick={() => handleCellClick(x, y)}
-              />
-            ))
-          )}
-        </div>
-        <table className={classNames.arenaTable}>
-          <tbody>{gameArena}</tbody>
-        </table>
-      </div>
+    <Container className={classNames.layout}>
+      <Grid container>
+        <Grid item md={8}>
+          <Box display="flex" justifyContent="center">
+            <div className={classNames.boardContainer}>
+              <div>
+                {board.map((row, y) =>
+                  row.map((cell, x) => (
+                    <span
+                      key={`${x},${y}`}
+                      className={classNames.spot}
+                      style={{
+                        top: `${(y + 1) * cellSize - clickableSize / 2}px`,
+                        left: `${(x + 1) * cellSize - clickableSize / 2}px`,
+                        backgroundColor: colorMapper[cell],
+                        borderColor: ![0, 1].includes(cell)
+                          ? 'transparent'
+                          : '#555',
+                      }}
+                      onClick={() => handleCellClick(x, y)}
+                    />
+                  ))
+                )}
+              </div>
+              <table className={classNames.arenaTable}>
+                <tbody>{gameArena}</tbody>
+              </table>
+            </div>
+          </Box>
+        </Grid>
+        <Grid item md={4}>
+          <Paper className={classNames.wrapper}>
+            <Typography variant="h6">Info</Typography>
+            <br />
+            <Typography variant="body1">ID: {gameId}</Typography>
+          </Paper>
+          <Paper className={classNames.wrapper}>
+            <Typography variant="h6">Actions</Typography>
+            <br />
+            <Button variant="contained" onClick={() => restartGame({ gameId })}>
+              Restart
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
