@@ -12,6 +12,8 @@ import {
   startGameFailure,
   signUpFailure,
   logInFailure,
+  endGameSuccess,
+  endGameFailure,
 } from './actions';
 import {
   serverPost,
@@ -20,9 +22,10 @@ import {
   getPlayerId,
   setPlayerId,
   clearPlayerId,
+  serverDelete,
 } from '../utils/utils';
 import { playerIdSelector } from './selectors';
-import { SUCCESS } from '../common/codes';
+import { SUCCESS, GAME_ENDED } from '../common/codes';
 
 const getParams = (store, config) => {
   const playerId = playerIdSelector(store.getState());
@@ -89,12 +92,16 @@ const handleRequestUpdate = (store, { payload }) => {
 
   serverGet(`/game/gomoku/update?${params.toString()}`).then((res) => {
     const {
-      data: { code, updates },
+      data: { code, message, updates },
     } = res;
 
-    if (code === SUCCESS && updates)
-      store.dispatch(requestUpdateSuccess({ updates }));
-    else if (code !== SUCCESS) store.dispatch(requestUpdateFailure());
+    if (code === SUCCESS) {
+      if (updates) store.dispatch(requestUpdateSuccess({ updates }));
+    } else if (code === GAME_ENDED) {
+      store.dispatch(endGameSuccess());
+    } else {
+      store.dispatch(requestUpdateFailure({ code, message }));
+    }
   });
 };
 
@@ -111,6 +118,17 @@ const handlePlay = (store, { payload }) => {
   );
 };
 
+const handleEndGame = (store, { payload }) => {
+  const { gameId } = payload;
+  const params = getParams(store, { gameId });
+
+  serverDelete(`/game/gomoku/end?${params.toString()}`).then((res) => {
+    const { code } = res.data;
+    if (code === SUCCESS) store.dispatch(endGameSuccess());
+    else store.dispatch(endGameFailure());
+  });
+};
+
 const handlers = {
   [actionTypes.SIGN_UP]: handleSignUp,
   [actionTypes.LOG_IN]: handleLogin,
@@ -118,6 +136,7 @@ const handlers = {
   [actionTypes.RESTART_GAME]: handleRestartGame,
   [actionTypes.REQUEST_UPDATE]: handleRequestUpdate,
   [actionTypes.PLAY_MOVE]: handlePlay,
+  [actionTypes.END_GAME]: handleEndGame,
 };
 
 const gameMiddleware = (store) => (next) => (action) => {

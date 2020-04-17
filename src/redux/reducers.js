@@ -21,6 +21,7 @@ const game = (state = initialGameState, action) => {
         loading: false,
       };
 
+    case actionTypes.END_GAME_SUCCESS:
     case actionTypes.START_GAME_FAILURE:
       return { ...state, id: null, loading: false };
 

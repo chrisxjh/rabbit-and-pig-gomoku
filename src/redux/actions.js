@@ -11,6 +11,10 @@ export const actionTypes = {
   START_GAME_SUCCESS: 'gomoku/START_GAME_SUCCESS',
   START_GAME_FAILURE: 'gomoku/START_GAME_FAILURE',
 
+  END_GAME: 'gomoku/END_GAME',
+  END_GAME_SUCCESS: 'gomoku/END_GAME_SUCCESS',
+  END_GAME_FAILURE: 'gomoku/END_GAME_FAILURE',
+
   RESTART_GAME: 'gomoku/RESTART_GAME',
   RESTART_GAME_SUCCESS: 'gomoku/RESTART_GAME_SUCCESS',
   RESTART_GAME_FAILURE: 'gomoku/RESTART_GAME_FAILURE',
@@ -64,6 +68,21 @@ export const startGameSuccess = (payload) => ({
 
 export const startGameFailure = (payload) => ({
   type: actionTypes.START_GAME_FAILURE,
+  payload,
+});
+
+export const endGame = (payload) => ({
+  type: actionTypes.END_GAME,
+  payload,
+});
+
+export const endGameSuccess = (payload) => ({
+  type: actionTypes.END_GAME_SUCCESS,
+  payload,
+});
+
+export const endGameFailure = (payload) => ({
+  type: actionTypes.END_GAME_FAILURE,
   payload,
 });
 

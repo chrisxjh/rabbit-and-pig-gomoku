@@ -1,7 +1,12 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { requestUpdate, playMove, restartGame } from '../../redux/actions';
+import {
+  requestUpdate,
+  playMove,
+  restartGame,
+  endGame,
+} from '../../redux/actions';
 import {
   gameIdSelector,
   gameBoardSelector,
@@ -58,6 +63,11 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
   },
+  actions: {
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
+  },
 }));
 
 const GameLayout = (props) => {
@@ -66,6 +76,7 @@ const GameLayout = (props) => {
     requestUpdate,
     restartGame,
     playMove,
+    endGame,
     board,
     playerId,
   } = props;
@@ -141,9 +152,21 @@ const GameLayout = (props) => {
           <Paper className={classNames.wrapper}>
             <Typography variant="h6">Actions</Typography>
             <br />
-            <Button variant="contained" onClick={() => restartGame({ gameId })}>
-              Restart
-            </Button>
+            <div className={classNames.actions}>
+              <Button
+                variant="contained"
+                onClick={() => restartGame({ gameId })}
+              >
+                Restart
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => endGame({ gameId })}
+              >
+                End game
+              </Button>
+            </div>
           </Paper>
         </Grid>
       </Grid>
@@ -158,6 +181,7 @@ GameLayout.propTypes = {
   requestUpdate: PropTypes.func.isRequired,
   playMove: PropTypes.func.isRequired,
   restartGame: PropTypes.func.isRequired,
+  endGame: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -170,5 +194,6 @@ const mapDispatchToProps = {
   requestUpdate,
   playMove,
   restartGame,
+  endGame,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(GameLayout);
