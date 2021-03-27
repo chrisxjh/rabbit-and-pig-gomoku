@@ -25,3 +25,8 @@ export const gameBoardSelector = createSelector(
   selectBoardDomain,
   (subState) => subState.board
 );
+
+export const gameIsOwnerSelector = createSelector(
+  selectGameDomain,
+  (subState) => subState.isOwner
+);

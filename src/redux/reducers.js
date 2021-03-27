@@ -4,26 +4,27 @@ import { actionTypes } from './actions';
 const initialGameState = {
   id: null,
   loading: false,
+  isOwner: false // TODO: this is maintained in frontend only, should sync with server
 };
 
 const game = (state = initialGameState, action) => {
-  const { type, payload } = action;
+  const { type, payload = {} } = action;
 
   switch (type) {
     case actionTypes.START_GAME:
-      return { ...state, id: null, loading: true };
+      return { ...state, id: null, loading: true, isOwner: !Boolean(payload.gameId) };
 
     case actionTypes.START_GAME_SUCCESS:
       return {
         ...state,
         id: payload.id,
         playerId: payload.playerId,
-        loading: false,
+        loading: false
       };
 
     case actionTypes.END_GAME_SUCCESS:
     case actionTypes.START_GAME_FAILURE:
-      return { ...state, id: null, loading: false };
+      return { ...state, id: null, loading: false, isOwner: false };
 
     default:
       break;

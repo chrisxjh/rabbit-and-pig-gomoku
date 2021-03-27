@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -11,6 +11,7 @@ import {
   gameIdSelector,
   gameBoardSelector,
   playerIdSelector,
+  gameIsOwnerSelector,
 } from '../../redux/selectors';
 import { Redirect } from 'react-router-dom';
 import {
@@ -79,6 +80,7 @@ const GameLayout = (props) => {
     endGame,
     board,
     playerId,
+    isOwner,
   } = props;
   const classNames = useStyles();
 
@@ -93,6 +95,14 @@ const GameLayout = (props) => {
       return () => clearInterval(interval);
     }
   }, [gameId, requestUpdate]);
+
+  const handleRestartGame = useCallback(() => {
+    if (isOwner) restartGame({ gameId });
+  }, [isOwner, gameId, restartGame]);
+
+  const handleEndGame = useCallback(() => {
+    if (isOwner) endGame({ gameId })
+  }, [isOwner, gameId, endGame]);
 
   if (!gameId) return <Redirect to="/" />;
 
@@ -155,14 +165,16 @@ const GameLayout = (props) => {
             <div className={classNames.actions}>
               <Button
                 variant="contained"
-                onClick={() => restartGame({ gameId })}
+                disabled={!isOwner}
+                onClick={handleRestartGame}
               >
                 Restart
               </Button>
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => endGame({ gameId })}
+                disabled={!isOwner}
+                onClick={handleEndGame}
               >
                 End game
               </Button>
@@ -177,6 +189,7 @@ const GameLayout = (props) => {
 GameLayout.propTypes = {
   gameId: PropTypes.string,
   playerId: PropTypes.string,
+  isOwner: PropTypes.bool.isRequired,
   board: PropTypes.arrayOf(PropTypes.array),
   requestUpdate: PropTypes.func.isRequired,
   playMove: PropTypes.func.isRequired,
@@ -187,6 +200,7 @@ GameLayout.propTypes = {
 const mapStateToProps = (state) => ({
   gameId: gameIdSelector(state),
   playerId: playerIdSelector(state),
+  isOwner: gameIsOwnerSelector(state),
   board: gameBoardSelector(state),
 });
 
