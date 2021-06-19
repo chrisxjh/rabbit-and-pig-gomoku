@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/rabbit-and-pig-gomoku/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/rabbit-and-pig-gomoku/static/js/main.58e78f02.chunk.js",
+    "main.js.map": "/rabbit-and-pig-gomoku/static/js/main.58e78f02.chunk.js.map",
+    "runtime-main.js": "/rabbit-and-pig-gomoku/static/js/runtime-main.484eda97.js",
+    "runtime-main.js.map": "/rabbit-and-pig-gomoku/static/js/runtime-main.484eda97.js.map",
+    "static/js/2.dfed138e.chunk.js": "/rabbit-and-pig-gomoku/static/js/2.dfed138e.chunk.js",
+    "static/js/2.dfed138e.chunk.js.map": "/rabbit-and-pig-gomoku/static/js/2.dfed138e.chunk.js.map",
+    "index.html": "/rabbit-and-pig-gomoku/index.html",
+    "precache-manifest.77a28a2481cd7d5a341b71d804834b82.js": "/rabbit-and-pig-gomoku/precache-manifest.77a28a2481cd7d5a341b71d804834b82.js",
+    "service-worker.js": "/rabbit-and-pig-gomoku/service-worker.js",
+    "static/css/main.5ecd60fb.chunk.css.map": "/rabbit-and-pig-gomoku/static/css/main.5ecd60fb.chunk.css.map",
+    "static/js/2.dfed138e.chunk.js.LICENSE.txt": "/rabbit-and-pig-gomoku/static/js/2.dfed138e.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.484eda97.js",
+    "static/js/2.dfed138e.chunk.js",
+    "static/css/main.5ecd60fb.chunk.css",
+    "static/js/main.58e78f02.chunk.js"
+  ]
+}
